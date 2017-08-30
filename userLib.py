@@ -18,7 +18,8 @@ class Session:
             print("h/H : Display this message")
             print("l/L;[c(urrent - default), a(rchived), b(oth)] : List notes")
             print("s/S;search-string;[c(urrent - default), a(rchived), b(oth)] : Search notes")
-            print("a/A/+;title;[body];[tags - comma-separated] : add a note")
+            print("a/A;title;[body];[tags - comma-separated] : add a note")
+            print("i/I;title;/path/to/file;[tags] : import a note from file")
             print("arch;note-id;[in - default/out] : move a note into or out of archive")
             print("d/D;note-id : delete a note forever")
             print("e/E;note-id;title;[body];[tags] : Edit a note that already exists - default unchanged - except title")
@@ -36,6 +37,7 @@ class Session:
                        "l":self.listNotes,
                        "s":self.searchNotes,
                        "a":self.addNote,
+                       "i":self.importNote,
                        "arch":self.archiveHandler,
                        "d":self.deleteNote,
                        "e":self.editNote,
@@ -90,6 +92,7 @@ class Session:
             choiceList.append("c")
         if(choiceList[2] not in ["a","b","c"]):
             print("Sorry, " + choiceList[2] + " isn't a valid search option")
+            return
         selectorMode = {"c":"current", "a":"archived", "b":"all"}[choiceList[2]]
         matchingNotes = []
         for note in self.conn.getNotes(mode=selectorMode):
@@ -219,3 +222,21 @@ class Session:
 
     def quit(self, choiceList):
         self.choice = "q"
+
+    def importNote(self, choiceList):
+        if(len(choiceList) < 3):
+            print("You must specify title and path when importing a file")
+            return
+        title = choiceList[1]
+        path = choiceList[2]
+        tags = ""
+        if(len(choiceList) > 3):
+            tags = choiceList[3]
+        try:
+            with open(path, "r") as noteFile:
+                body = noteFile.read()
+        except:
+            print("Sorry, failed to read file. Did you get the path right?")
+            return
+        self.conn.addNote(title, body, tags)
+        print("Note imported")
