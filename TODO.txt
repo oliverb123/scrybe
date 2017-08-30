@@ -1,6 +1,9 @@
-Build tag system
-    *Implement tag matching in search function
+Implement import functionality:
+    *Edit edit note function to include mode switching between
+        specifying a body and specifying a path
+        (Should notes remember the path they came from an auto update?)
+    *Build import function, mapped to "i/I", that takes a title, a path
+        to a file, and a set of tags, very similar to add function
 
-Implement remaining session functions
-    *Keep in mind future tag system
-
+Ongoing:
+    *Keep tweaking search algorithm weights
