@@ -1,0 +1,6 @@
+Build tag system
+    *Implement tag matching in search function
+
+Implement remaining session functions
+    *Keep in mind future tag system
+
