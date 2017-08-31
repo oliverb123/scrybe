@@ -2,12 +2,12 @@
 import sqlite3 as sql
 import os
 
+cwd = os.getcwd() + "/"
+
 try:
-    os.remove("scrybe.db")
+    os.remove(cwd + "scrybe.db")
 except:
     pass
-
-cwd = os.getcwd() + "/"
 
 conn = sql.connect(cwd + "scrybe.db")
 c = conn.cursor()
