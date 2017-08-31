@@ -1,6 +1,3 @@
-Implement import functionality:
-    *Implement update function, that works like edit but pulls from a file
-
 Build a better setup.py, with config options and stuff
 
 Ongoing:
