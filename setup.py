@@ -16,14 +16,16 @@ c.execute(command)
 conn.commit()
 conn.close()
 
-with open("~/.bashrc", "a+") as bashrc:
-    bashrc.write("alias scrybe='python " + cwd + "scrybe.py" + " '\n")
+with open(os.environ["HOME"] + "/.bashrc", "a+") as bashrc:
+    bashrc.write("alias scrybe='python " + cwd + "scrybe.py" + "'\n")
 
-os.system("source ~/.bashrc")
+os.system("python " + cwd + "scrybe.py")
 
 with open(cwd + "dbLib.py", "r") as oldDbLib:
     newDbLibString = oldDbLib.read().replace("scrybe.db", cwd + "scrybe.db")
 
 with open(cwd + "dbLib.py", "w") as newDbLib:
     newDbLib.write(newDbLibString)
+    newDbLib.close()
 
+print("Setup Finished, Starting Scrybe")
