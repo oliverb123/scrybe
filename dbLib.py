@@ -8,7 +8,7 @@ class Note:
         self.createTime = float(createTime)
         self.id = int(noteId)
         self.archived = int(archived)
-        self.tags = tags.split(",")
+        self.tags = [tag.strip() for tag in tags.split(",")]
 
 class ConnectionHandler:
     def __init__(self, dbName="scrybe.db"):

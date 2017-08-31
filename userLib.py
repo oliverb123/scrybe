@@ -22,7 +22,7 @@ class Session:
             print("i/I;title;/path/to/file;[tags] : import a note from file")
             print("arch;note-id;[in - default/out] : move a note into or out of archive")
             print("d/D;note-id : delete a note forever")
-            print("e/E;note-id;title;[body];[tags] : Edit a note that already exists - default unchanged - except title")
+            print("e/E;note-id;title;[body];[tags];[m(anual - default)/i(mport file)] : Edit a note that already exists")
             print("g/G;note-id : Retrieve a specific note")
             print("q/Q : Quit Scrybe")
 
@@ -109,7 +109,10 @@ class Session:
         printString = ""
         for noteTuple in matchingNotes:
             printString += self.oneLineStringGen(noteTuple[0])
-        print(printString)
+        if(printString):
+            print(printString)
+        else:
+            print("Nothing found matching those search terms, sorry")
 
     def addNote(self, choiceList):#adds a note to the db
         if(len(choiceList) < 2):
@@ -201,6 +204,17 @@ class Session:
         elif(len(choiceList) > 3):
             if(choiceList[3] != ""):
                 newBody = choiceList[3]
+        if(len(choiceList) > 5 and choiceList[5]):
+            if(choiceList[5].strip().lower() not in ["m", "i"]):
+                print("Sorry, " + choiceList[5] + " isn't a valid edit command")
+                return
+            if(choiceList[5].strip().lower() == "i"):
+                try:
+                    with open(newBody.strip(), "r") as bodyFile:
+                        newBody = bodyFile.read()
+                except:
+                    print("Sorry, failed to read file (is the path right?)")
+                    return
         self.conn.editNote(noteId, newTitle, newBody, newTags)
         print("Note " + str(noteId) + " edited")
 
