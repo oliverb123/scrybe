@@ -32,6 +32,7 @@ class Session:
             print("h/H : Display this message")
             print("l/L;[c(urrent - default), a(rchived), b(oth)] : List notes")
             print("s/S;search-string;[c(urrent - default), a(rchived), b(oth)] : Search notes")
+            print("f/F;tag1[,tag2,...] : List only notes with all tags given")
             print("a/A;title;[tags - comma-separated] : add a note")
 #            print("i/I;title;/path/to/file;[tags] : import a note from file")
             print("arch;note-id;[in - default/out] : move a note into or out of archive")
@@ -58,6 +59,7 @@ class Session:
                        "e":self.editNote,
                        "g":self.getNote,
                        "c":self.clear,
+                       "f":self.filter,
                        "q":self.quit}
         if(choiceList[0] not in choiceFuncs.keys()):
             print("Sorry, " + choiceList[0] + " isn't a valid command (enter 'h' for help)")
@@ -276,3 +278,19 @@ class Session:
             return
         self.conn.addNote(title, body, tags)
         print("Note imported")
+
+    def filter(self, choiceList):
+        if(len(choiceList) < 2 or not choiceList[1]):
+            print("You need to supply atleast one tag to filter by")
+        tagList = choiceList[1].split(",")
+        tagList = map(lambda x: x.strip(), tagList)
+        notes = self.conn.getNotes()
+        printString = ""
+        for note in notes:
+            matchingTags = [tag for tag in tagList if tag in note.tags]
+            if(len(matchingTags) == len(tagList)):
+                printString += (self.oneLineStringGen(note))
+        if(not printString):
+            printString = "Sorry, nothing matching that filter found"
+        print(printString)
+
