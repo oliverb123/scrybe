@@ -1,3 +1,4 @@
+import os
 import dbLib
 import time
 
@@ -18,12 +19,13 @@ class Session:
             print("h/H : Display this message")
             print("l/L;[c(urrent - default), a(rchived), b(oth)] : List notes")
             print("s/S;search-string;[c(urrent - default), a(rchived), b(oth)] : Search notes")
-            print("a/A;title;[body];[tags - comma-separated] : add a note")
-            print("i/I;title;/path/to/file;[tags] : import a note from file")
+            print("a/A;title;[tags - comma-separated] : add a note")
+#            print("i/I;title;/path/to/file;[tags] : import a note from file")
             print("arch;note-id;[in - default/out] : move a note into or out of archive")
             print("d/D;note-id : delete a note forever")
-            print("e/E;note-id;title;[body];[tags];[m(anual - default)/i(mport file)] : Edit a note that already exists")
-            print("g/G;note-id : Retrieve a specific note")
+            print("e/E;note-id;[title];[tags] : Edit a note that already exists")
+            print("g/G;note-id : View a specific note")
+            print("c/C: Clear screen")
             print("q/Q : Quit Scrybe")
 
     def parseInput(self, choiceString):
@@ -42,6 +44,7 @@ class Session:
                        "d":self.deleteNote,
                        "e":self.editNote,
                        "g":self.getNote,
+                       "c":self.clear,
                        "q":self.quit}
         if(choiceList[0] not in choiceFuncs.keys()):
             print("Sorry, " + choiceList[0] + " isn't a valid command (enter 'h' for help)")
@@ -76,6 +79,7 @@ class Session:
         printString += str(noteId) + " | "
         printString += title + " | "
         printString += body
+        printString = printString.replace("\n", " ")
         if(len(printString + appendString) > maxChars):
             appendString = "..." + appendString
             maxLengthBeforeAppend = maxChars - len(appendString)
@@ -115,18 +119,23 @@ class Session:
             print("Nothing found matching those search terms, sorry")
 
     def addNote(self, choiceList):#adds a note to the db
-        if(len(choiceList) < 2):
+        if(len(choiceList) > 2 and choiceList[1]):
+            title = choiceList[1]
+        else:
             print("Notes require a title")
             return
-        title = choiceList[1]
-        if(len(choiceList) > 3):
-            body = choiceList[2]
-            tags = choiceList[3]
-        elif(len(choiceList) > 2):
-            body = choiceList[2]
-        else:
+        tags = ""
+        if(len(choiceList) > 2):
+            tags = choiceList[2]
+        with open(".scrybe.tmp", "w") as tmpFile:
+            tmpFile.write("#Note: " + title + "(Esc :wq to save note and quit)")
+        os.system("vim .scrybe.tmp")
+        with open(".scrybe.tmp", "r") as tmpFile:
             body = ""
-            tags = ""
+            for line in tmpFile.readlines():
+                if(line.strip() and line.strip()[0] != "#"):
+                    body += line
+        os.remove(".scrybe.tmp")
         self.conn.addNote(title, body, tags)
         print("Note added")
 
@@ -141,7 +150,7 @@ class Session:
         archived = ["Current", "Archived"][note.archived]
         printString = ""
         printString += title + "\n"
-        printString += str(noteId) + " | " + createTimeString + " | " + archived + "\n"
+        printString += str(noteId) + " | " + createTimeString + " | " + archived  + "\n"
         printString += tagString + "\n"
         printString += body
         return(printString)
@@ -181,40 +190,35 @@ class Session:
             print("Deletion cancelled")
 
     def editNote(self, choiceList):
-        if(len(choiceList) < 3):
-            print("You need to sepcify a note by id, and give a title")
+        if(len(choiceList) < 2):
+            print("You need to sepcify a note by id")
             return
         try:
             noteId = int(choiceList[1])
         except:
             print("Note id must be an integer")
             return
-        note = self.conn.getNote(noteId)
-        newTitle = choiceList[2]
-        if(newTitle == ""):
-            print("Titles cannot be blank")
+        try:
+            note = self.conn.getNote(noteId)
+        except:
+            print("No note found of that id (did you delete it?)")
             return
+        newTitle = note.title
+        if(len(choiceList) > 2 and choiceList[2]):
+            newTitle = choiceList[2]
         newBody = note.body
         newTags = ",".join(note.tags)
-        if(len(choiceList) > 4):
-            if(choiceList[3] != ""):
-                newBody = choiceList[3]
-            if(choiceList[4] != ""):
-                newTags = choiceList[4]
-        elif(len(choiceList) > 3):
-            if(choiceList[3] != ""):
-                newBody = choiceList[3]
-        if(len(choiceList) > 5 and choiceList[5]):
-            if(choiceList[5].strip().lower() not in ["m", "i"]):
-                print("Sorry, " + choiceList[5] + " isn't a valid edit command")
-                return
-            if(choiceList[5].strip().lower() == "i"):
-                try:
-                    with open(newBody.strip(), "r") as bodyFile:
-                        newBody = bodyFile.read()
-                except:
-                    print("Sorry, failed to read file (is the path right?)")
-                    return
+        if(len(choiceList) > 3 and choiceList[3]):
+            newTags = choiceList[3]
+        with open(".scrybe.tmp", "w") as tmpFile:
+            tmpFile.write(newBody)
+        os.system("vim .scrybe.tmp")
+        with open(".scrybe.tmp", "r") as tmpFile:
+            newBody = ""
+            for line in tmpFile.readlines():
+                if(line.strip() and line.strip()[0] != "#"):
+                    newBody += line
+        os.remove(".scrybe.tmp")
         self.conn.editNote(noteId, newTitle, newBody, newTags)
         print("Note " + str(noteId) + " edited")
 
@@ -236,6 +240,9 @@ class Session:
 
     def quit(self, choiceList):
         self.choice = "q"
+
+    def clear(self, choiceList):
+        os.system("clear")
 
     def importNote(self, choiceList):
         if(len(choiceList) < 3):
