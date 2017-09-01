@@ -1,4 +1,5 @@
-##Setup:
+## Setup:
+
 * Clone the repo:
 `git clone https://github.com/oliverb123/scrybe scrybe/`
 
@@ -12,4 +13,5 @@
 `Vim, emacs or nano?: Vim`
 
 That's it. `scrybe` is now an alias in your .bashrc, and you're good to go
-###Enjoy!!
+
+### Enjoy!!
