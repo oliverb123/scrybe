@@ -19,8 +19,6 @@ conn.close()
 with open(os.environ["HOME"] + "/.bashrc", "a+") as bashrc:
     bashrc.write("alias scrybe='python " + cwd + "scrybe.py" + "'\n")
 
-os.system("python " + cwd + "scrybe.py")
-
 with open(cwd + "dbLib.py", "r") as oldDbLib:
     newDbLibString = oldDbLib.read().replace("scrybe.db", cwd + "scrybe.db")
 
@@ -28,4 +26,15 @@ with open(cwd + "dbLib.py", "w") as newDbLib:
     newDbLib.write(newDbLibString)
     newDbLib.close()
 
-print("Setup Finished, Starting Scrybe")
+editor = ""
+while(editor not in ["vim", "emacs", "nano"]):
+    editor = raw_input("Vim, emacs or nano?: ").strip().lower()
+
+with open(cwd + ".scrybe.conf", "a") as configFile:
+    configFile.write("editor:" + editor)
+
+with open(cwd + "userLib.py", "r") as userLib:
+    userLibString = userLib.read().replace(".scrybe.conf", cwd + ".scrybe.conf")
+
+with open(cwd + "userLib.py", "w") as userLib:
+    userLib.write(userLibString)

@@ -5,6 +5,19 @@ import time
 class Session:
     def __init__(self):
         self.conn = dbLib.ConnectionHandler()
+        self.conf = self.getConfig()
+
+    def getConfig(self):
+        conf = {}
+        with open(".scrybe.conf", "r") as configFile:
+            for line in configFile.readlines():
+                if(line.strip() and line.strip()[0] != "#"):
+                    try:
+                        key, val = line.split(":")
+                    except:
+                        continue
+                    conf[key.strip()] = val.strip()
+        return(conf)
 
     def start(self):
         self.choice = ""
@@ -129,13 +142,15 @@ class Session:
             tags = choiceList[2]
         with open(".scrybe.tmp", "w") as tmpFile:
             tmpFile.write("#Note: " + title + "(Esc :wq to save note and quit)")
-        os.system("vim .scrybe.tmp")
+        os.system(self.conf["editor"] + " .scrybe.tmp")
         with open(".scrybe.tmp", "r") as tmpFile:
             body = ""
             for line in tmpFile.readlines():
                 if(line.strip() and line.strip()[0] != "#"):
                     body += line
         os.remove(".scrybe.tmp")
+        if(not body):
+            print("Note addition cancelled due to empty body")
         self.conn.addNote(title, body, tags)
         print("Note added")
 
@@ -212,7 +227,7 @@ class Session:
             newTags = choiceList[3]
         with open(".scrybe.tmp", "w") as tmpFile:
             tmpFile.write(newBody)
-        os.system("vim .scrybe.tmp")
+        os.system(self.conf["editor"] + " .scrybe.tmp")
         with open(".scrybe.tmp", "r") as tmpFile:
             newBody = ""
             for line in tmpFile.readlines():
