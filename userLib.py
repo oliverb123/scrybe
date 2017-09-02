@@ -38,7 +38,7 @@ class Session:
 #        print("i/I;title;/path/to/file;[tags] : import a note from file")
         print("arch;note-id;[in - default/out] : move a note into or out of archive")
         print("d/D;note-id : delete a note forever")
-        print("e/E;note-id;[title];[tags] : Edit a note that already exists")
+        print("e/E;note-id;[title];[tags] : Edit a note that already exists - save an empty file to cancel")
         print("g/G;note-id : View a specific note")
         print("c/C: Clear screen")
         print("q/Q : Quit Scrybe")
@@ -82,7 +82,7 @@ class Session:
         else:
             for note in notesList:
                 printString += self.oneLineStringGen(note)
-        print(printString)
+        print(printString.strip())
 
     def oneLineStringGen(self, note, maxChars=60):#one line repr of passed note
         noteId = note.id
@@ -130,7 +130,7 @@ class Session:
         for noteTuple in matchingNotes:
             printString += self.oneLineStringGen(noteTuple[0])
         if(printString):
-            print(printString)
+            print(printString.strip())
         else:
             print("Nothing found matching those search terms, sorry")
 
@@ -169,7 +169,7 @@ class Session:
         printString += str(noteId) + " | " + createTimeString + " | " + archived  + "\n"
         printString += tagString + "\n"
         printString += body
-        return(printString)
+        return(printString.strip())
 
     def archiveHandler(self, choiceList):
         if(len(choiceList) < 2):
@@ -207,7 +207,7 @@ class Session:
 
     def editNote(self, choiceList):
         if(len(choiceList) < 2):
-            print("You need to sepcify a note by id")
+            print("You need to specify a note by id")
             return
         try:
             noteId = int(choiceList[1])
@@ -222,12 +222,12 @@ class Session:
         newTitle = note.title
         if(len(choiceList) > 2 and choiceList[2]):
             newTitle = choiceList[2]
-        newBody = note.body
+        oldBody = note.body
         newTags = ",".join(note.tags)
         if(len(choiceList) > 3 and choiceList[3]):
             newTags = choiceList[3]
         with open(".scrybe.tmp", "w") as tmpFile:
-            tmpFile.write(newBody)
+            tmpFile.write(oldBody)
         os.system(self.conf["editor"] + " .scrybe.tmp")
         with open(".scrybe.tmp", "r") as tmpFile:
             newBody = ""
@@ -235,6 +235,9 @@ class Session:
                 if(line.strip() and line.strip()[0] != "#"):
                     newBody += line
         os.remove(".scrybe.tmp")
+        if((newBody == oldBody or not newBody) and newTags == note.tags):
+            print("Note edit cancelled")
+            return
         self.conn.editNote(noteId, newTitle, newBody, newTags)
         print("Note " + str(noteId) + " edited")
 
@@ -291,5 +294,5 @@ class Session:
                 printString += (self.oneLineStringGen(note))
         if(not printString):
             printString = "Sorry, nothing matching that filter found"
-        print(printString)
+        print(printString.strip())
 
