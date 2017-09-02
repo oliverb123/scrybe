@@ -142,8 +142,6 @@ class Session:
         tags = ""
         if(len(choiceList) > 2):
             tags = choiceList[2]
-        with open(".scrybe.tmp", "w") as tmpFile:
-            tmpFile.write("#Note: " + title + "(Esc :wq to save note and quit)")
         os.system(self.conf["editor"] + " .scrybe.tmp")
         with open(".scrybe.tmp", "r") as tmpFile:
             body = ""
