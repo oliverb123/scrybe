@@ -1,6 +1,7 @@
 import os
 import dbLib
 import time
+import re
 
 class Session:
     def __init__(self):
@@ -284,6 +285,15 @@ class Session:
         print("Note imported")
 
     def filter(self, choiceList):
+        if(len(choiceList) < 3):
+            self.tagFilter( choiceList)
+        elif(choiceList[2].lower() not in ["t", "d"]):
+            print("Sorry, " + choiceList[2] + " isn't a valid filter option")
+        else:
+            filterMatch = {"t":self.tagFilter, "d":self.dateFilter}
+            filterMatch[choiceList[2].lower()](choiceList)
+
+    def tagFilter(self, choiceList):
         if(len(choiceList) < 2 or not choiceList[1]):
             print("You need to supply atleast one tag to filter by")
         tagList = choiceList[1].split(",")
@@ -313,4 +323,43 @@ class Session:
              return
         for tagPair in tagPairs:
              print(" | " + tagPair[0] + " : " + str(tagPair[1]) + " | ")
+
+    def dateFilter(self, choiceList):#lil present for reading the code ;)-TODO
+        #TODO -- Fix this fucking mess
+        choiceList[1] = choiceList[1].lower()
+        lowPass = time.time()
+        highPass = 0
+        keywordMap = {"day":60*60*24,
+                      "week":60*60*24*7,
+                      "month":60*60*24*7*31,
+                      "quarter":60*60*24*7*31*3,
+                      "year":60*60*24*365}#hazy second-to-keyword mapping
+        singleDate = "\d\d/\d\d\/\d\d\d\d"
+        singleDateRe = re.compile(singleDate)
+        doubleDateRe = re.compile(singleDate + ":" + singleDate)
+        if(choiceList[1] in keywordMap.keys()):
+            lowPass -= keywordMap[choiceList[1]]
+        elif(singleDateRe.match(choiceList[1])):
+            lowPass = time.mktime(time.strptime(choiceList[1], "%d/%m/%Y"))
+        elif(doubleDateRe.match(choiceList[1])):
+            dates = choiceList[1].split(":")
+            lowPass = time.mktime(time.strptime(dates[0], "%d/%m/%Y"))
+            highPass = time.mktime(time.strptime(choiceList[1], "%d/%m/%Y"))
+        else:
+            print("Sorry, that date format isn't valid")
+            return
+        if(not highPass):
+            highPass = time.time()
+        notes = self.conn.getNotes()
+        if(not notes):
+            print("You don't have any notes to filter")
+        matchingNotes = []
+        for note in notes:
+            if(note.createTime > lowPass and note.createTime < highPass):
+                matchingNotes.append(note)
+        matchingNotes.sort(key = lambda x: x.createTime, reverse=True)
+        printString = ""
+        for note in matchingNotes:
+            printString += self.oneLineStringGen(note)
+        print(printString.strip())
 
