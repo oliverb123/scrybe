@@ -16,15 +16,19 @@ c.execute(command)
 conn.commit()
 conn.close()
 
-with open(os.environ["HOME"] + "/.bashrc", "a+") as bashrc:
-    bashrc.write("alias scrybe='python " + cwd + "scrybe.py" + "'\n")
-
 #add needed shell file extensions to list
-shellFiles = [".zshrc"]
+shellFiles = [".zshrc", ".bashrc"]
 for fileName in shellFiles:
+    aliased = False
+    #used so we can default to .bashrc on the off chance no .*rc file exists
     fullName = os.environ["HOME"] + "/" + fileName
     if os.path.exists(fullName):
-        open(fullName, "a+").write("alias scrybe='python " + cwd + "scrybe.py" + "'\n")
+        with open(fullName, "a+") as rcFile:
+            rcFile.write("alias scrybe='python " + cwd + "scrybe.py" + "'\n")
+        aliased = True
+    if(not aliased):
+        with open(os.environ["HOME"] + "/.bashrc", "a+") as rcFile:
+            rcFile.write("alias scrybe='python " + cwd + "scrybe.py" + "'\n")
 
 with open(cwd + "dbLib.py", "r") as oldDbLib:
     newDbLibString = oldDbLib.read().replace("scrybe.db", cwd + "scrybe.db")
