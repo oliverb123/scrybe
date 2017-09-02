@@ -300,17 +300,17 @@ class Session:
 
     def getTags(self, choiceList):
         notes = self.conn.getNotes()
-        tagTuples = []
+        tagPairs = []
         for note in notes:
             for tag in note.tags:
-                tagList = [tagTuple[0] for tagTuple in tagTuples]
+                tagList = [tagPair[0] for tagPair in tagPairs]
                 if(tag in tagList):
-                    tagTuples[tagList.index(tag)][1] += 1
+                    tagPairs[tagList.index(tag)][1] += 1
                 else:
-                    tagTuples.append((tag, 1))
-        if(not tagTuples):
+                    tagPairs.append([tag, 1])
+        if(not tagPairs):
              print("You haven't tagged anything")
              return
-        for tagTuple in tagTuples:
-             print(" | " + tagTuple[0] + " : " + str(tagTuple[1]) + " | ")
+        for tagPair in tagPairs:
+             print(" | " + tagPair[0] + " : " + str(tagPair[1]) + " | ")
 
