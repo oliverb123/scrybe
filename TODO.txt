@@ -1,4 +1,7 @@
+Build a tag listing function:
+    -List each tag, and the number of notes associated with it
+
 Build a better setup.py, with config options and stuff
 
 Ongoing:
-    *Keep tweaking search algorithm weights
+    -Keep tweaking search algorithm weights
