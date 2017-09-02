@@ -17,4 +17,70 @@ Scrybe is a simple terminal application for taking notes, using your favourite t
 
 That's it. `scrybe` is now an alias in your .bashrc, and you're good to go
 
+## Usage
+
+The general structur of command for scrybe is as follows:
+
+command;parameter 1;parameter 2 etc
+
+The help command ("h/H") provides a useful way to review the commands available
+to you within scrybe, but it uses some specific notation to tell you whether
+and option must be included or not. Things that are simply written, with no 
+punctuation around them, e.g. "note-id", are mandatory for that command. Things
+surrounded by square brackets, e.g. "[tags - comma-separated]" are optional 
+parameters for this command, and things surrounded by standard brackets, e.g.
+"[b(oth)]" are there to provide some explanation, usually for a single letter
+parameter. When parameters are separated by a comma, it means you mus choose one
+from the list shown.
+
+#### Command reference:
+
+* h/H : Displays the help message, which is a less verbose version of this
+reference
+
+* l/L;[c(urrent - default option), a(rchived), b(oth)] : List every note you
+have saved to scybe, defaulting to notes you haven't archived yet. Note that the
+implementation of archiving notes is spotty at best, right now I'd simply ignore
+it -- It's on the todo list
+
+* t/T : List every tag you've applied to any note in scrybe
+
+* s/S;search-string;[c(urrent - default), a(rchived), b(oth)] : performs a
+weighted search of your notes, and prints a list of notes ordered relative to
+how well they match your search term. The weighting of the search is still
+changing, so if you have a suggestion feel free to open an issue!
+
+* f/F;tag1[,tag2,...] : Lists only notes that contain every single tag specified
+in the comma seperated list that makes up the second parameter. Tags are stripped
+ of whitespace before being used to filter. Creation date based filtering is
+ on the roadmap, the functionality is there but I want to clean it up and make
+ make it more efficient before exposing it to users
+
+* a/A;title;[tags - comma seperated] : Add a new note - pretty self explanatory
+
+* arch;note-id;[in(default), out] : Move a note into or out of archive. Again,
+this feaure is under-loved right now, I'd avoid using it. I can't promise it's
+continued support, although I am unlikely to rip it out
+
+* d/D;note-id : Delete a note from scrybe, forever. You'll be asked to confirm
+before the note is deleted, so don't panic too much if you accidentally miss 
+type
+
+* e/E;note-id;[title];[tags] : edit a note. If title is left blank, it's kept
+unchanged. If tags are left blank, they're kept unchanged. If you don't modify
+the note body when the editor launches before saving and quitting, or if you
+totally clear the editor (save a blank file), the body will be left unchanged.
+Please note that if you pass a non-empty tag parameter, whatever string of
+comma separated tags you pass will __replace__ the old tags, not be appended to
+them. A way to tell scrybe to append instead of replace is on the todo list, and
+suggestons as to the best way to implement this are welcome (currently thinking
+if the tag parameter starts with a "+" append instead of replace)
+
+* g/G : Print the entire text of a note, as well as all it's metadata (title,
+tags, createTime and whether or not it's archived)
+
+* c/C : clear the terminal screen, for people like me who live a clear terminal
+
+* q/Q : close scrybe
+
 ### Enjoy!!

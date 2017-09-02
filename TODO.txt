@@ -1,5 +1,6 @@
 Immediate:
     -Write a usage section into README.md
+    -Update all functions to respect archived notes    
 
 Roadmap:
     -Some kind of time based filtering
