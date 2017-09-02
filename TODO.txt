@@ -1,3 +1,6 @@
+Immediate:
+    -Write a usage section into README.md
+
 Roadmap:
     -Some kind of time based filtering
     -Improved commandline input (working arrow keys ffs)
