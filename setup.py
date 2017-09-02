@@ -19,6 +19,13 @@ conn.close()
 with open(os.environ["HOME"] + "/.bashrc", "a+") as bashrc:
     bashrc.write("alias scrybe='python " + cwd + "scrybe.py" + "'\n")
 
+#add needed shell file extensions to list
+shellFiles = [".zshrc"]
+for fileName in shellFiles:
+    fullName = os.environ["HOME"] + "/" + fileName
+    if os.path.exists(fullName):
+        open(fullName, "a+").write("alias scrybe='python " + cwd + "scrybe.py" + "'\n")
+
 with open(cwd + "dbLib.py", "r") as oldDbLib:
     newDbLibString = oldDbLib.read().replace("scrybe.db", cwd + "scrybe.db")
 
