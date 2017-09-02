@@ -28,19 +28,20 @@ class Session:
 
 
     def displayHelp(self, choiceList=None):
-            print("Options as follows:")
-            print("h/H : Display this message")
-            print("l/L;[c(urrent - default), a(rchived), b(oth)] : List notes")
-            print("s/S;search-string;[c(urrent - default), a(rchived), b(oth)] : Search notes")
-            print("f/F;tag1[,tag2,...] : List only notes with all tags given")
-            print("a/A;title;[tags - comma-separated] : add a note")
-#            print("i/I;title;/path/to/file;[tags] : import a note from file")
-            print("arch;note-id;[in - default/out] : move a note into or out of archive")
-            print("d/D;note-id : delete a note forever")
-            print("e/E;note-id;[title];[tags] : Edit a note that already exists")
-            print("g/G;note-id : View a specific note")
-            print("c/C: Clear screen")
-            print("q/Q : Quit Scrybe")
+        print("Key: mandatory, [optional], (explanatory - do not include)")
+        print("Options as follows:")
+        print("h/H : Display this message")
+        print("l/L;[c(urrent - default), a(rchived), b(oth)] : List notes")
+        print("s/S;search-string;[c(urrent - default), a(rchived), b(oth)] : Search notes")
+        print("f/F;tag1[,tag2,...] : List only notes with all tags given")
+        print("a/A;title;[tags - comma-separated] : add a note")
+#        print("i/I;title;/path/to/file;[tags] : import a note from file")
+        print("arch;note-id;[in - default/out] : move a note into or out of archive")
+        print("d/D;note-id : delete a note forever")
+        print("e/E;note-id;[title];[tags] : Edit a note that already exists")
+        print("g/G;note-id : View a specific note")
+        print("c/C: Clear screen")
+        print("q/Q : Quit Scrybe")
 
     def parseInput(self, choiceString):
         if(not choiceString):#user accidentally pressed enter
