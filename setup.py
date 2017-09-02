@@ -17,7 +17,7 @@ conn.commit()
 conn.close()
 
 with open(os.environ["HOME"] + "/.bashrc", "a+") as bashrc:
-    bashrc.write("alias scrybe='python " + cwd + "scrybe.py" + "'\n")
+    bashrc.write("alias scrybe='python3 " + cwd + "scrybe.py" + "'\n")
 
 with open(cwd + "dbLib.py", "r") as oldDbLib:
     newDbLibString = oldDbLib.read().replace("scrybe.db", cwd + "scrybe.db")
@@ -28,7 +28,7 @@ with open(cwd + "dbLib.py", "w") as newDbLib:
 
 editor = ""
 while(editor not in ["vim", "emacs", "nano"]):
-    editor = raw_input("Vim, emacs or nano?: ").strip().lower()
+    editor = input("Vim, emacs or nano?: ").strip().lower()
 
 with open(cwd + ".scrybe.conf", "a") as configFile:
     configFile.write("editor:" + editor)

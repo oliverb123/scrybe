@@ -23,7 +23,7 @@ class Session:
         self.choice = ""
         self.displayHelp()
         while(self.choice.lower() != "q"):
-            self.choice = raw_input("->")
+            self.choice = input("->")
             self.parseInput(self.choice)
 
 
@@ -198,7 +198,7 @@ class Session:
         except:
             print("Note index must be an integer")
             return
-        verify = raw_input("Are you sure (y/n)?")
+        verify = input("Are you sure (y/n)?")
         if(verify.strip().lower() == "y"):
             self.conn.deleteNote(noteId)
             print("Note deleted")
