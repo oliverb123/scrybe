@@ -32,6 +32,7 @@ class Session:
         print("Options as follows:")
         print("h/H : Display this message")
         print("l/L;[c(urrent - default), a(rchived), b(oth)] : List notes")
+        print("t/T : List your tags, and the number of notes each contains")
         print("s/S;search-string;[c(urrent - default), a(rchived), b(oth)] : Search notes")
         print("f/F;tag1[,tag2,...] : List only notes with all tags given")
         print("a/A;title;[tags - comma-separated] : add a note")
@@ -61,6 +62,7 @@ class Session:
                        "g":self.getNote,
                        "c":self.clear,
                        "f":self.filter,
+                       "t":self.getTags,
                        "q":self.quit}
         if(choiceList[0] not in choiceFuncs.keys()):
             print("Sorry, " + choiceList[0] + " isn't a valid command (enter 'h' for help)")
@@ -295,4 +297,20 @@ class Session:
         if(not printString):
             printString = "Sorry, nothing matching that filter found"
         print(printString.strip())
+
+    def getTags(self, choiceList):
+        notes = self.conn.getNotes()
+        tagTuples = []
+        for note in notes:
+            for tag in note.tags:
+                tagList = [tagTuple[0] for tagTuple in tagTuples]
+                if(tag in tagList):
+                    tagTuples[tagList.index(tag)][1] += 1
+                else:
+                    tagTuples.append((tag, 1))
+        if(not tagTuples):
+             print("You haven't tagged anything")
+             return
+        for tagTuple in tagTuples:
+             print(" | " + tagTuple[0] + " : " + str(tagTuple[1]) + " | ")
 
