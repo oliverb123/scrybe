@@ -1,7 +1,7 @@
-Build a tag listing function:
-    -List each tag, and the number of notes associated with it
-
-Build a better setup.py, with config options and stuff
+Roadmap:
+    -Some kind of time based filtering
+    -Improved commandline input (working arrow keys ffs)
+    -Database encryption? Maybe
 
 Ongoing:
     -Keep tweaking search algorithm weights
