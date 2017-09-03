@@ -64,31 +64,22 @@ weighted search of your notes, and prints a list of matching notes, ordered by
 how well they match your search term. The weighting of the search is still
 changing, so if you have a suggestion feel free to open an issue!
 
-* f/F;tag1[,tag2,...] : Lists only notes that contain every single tag specified
-in the comma separated list that makes up the second parameter. Tags are stripped
- of whitespace before being used to filter. Creation date based filtering is
- on the roadmap, the functionality is there but I want to clean it up and make
- make it more efficient before exposing it to users
+* f/F;filter;archive-mode;filter-mode - Filter. The filter has two main modes, tag based filtering and create time based filtering. The paramters passed to each filter mode are as follows:
+    * Tag based filter - signature: f/F;tag1,tag1,...,tagN;[c(urrent - default), a(rchived), b(oth)];[t] - notes will only pass through a tag based filter if **all tags** in the filter are attached to the note. Tag based filtering is the default filter mode, and it will only look at non-archived notes by default
+    * Date based filter - signature: f/F;filter;[c(urrent - default), a(rchived), b(oth)];d - the filter options for date filtering are as follows:
+        * You can pass a keyword to the filter to get every note created in the last whatever the keyword is. Supported keywords right now are "day", "week", "month", "quarter" and "year"
+        * You can also pass a single date in the form dd/mm/yyyy to get every note created since that date e.g. f;01/09/2017;b;d will get every note, archived or not, created since the first of september 2017. f;01/09/2017;;d would get only the unarchived ones
+        * You can also pass two dates in the format dd/mm/yyyy:dd/mm/yyyy to get every note created between those two dates, e.g. f;01/01/2017:01;02;2017;b;d will get every note created between the first of January 2017 and the first of february 2017. **Please note** this will exclude notes created **on** the first of February 2017.
 
 * a/A;title;[tags - comma seperated] : Add a new note - pretty self explanatory
 
-* arch;note-id;[in(default), out] : Move a note into or out of archive. Again,
-this feaure is under-loved right now, I'd avoid using it. I can't promise it's
-continued support, although I am unlikely to rip it out
+* arch;note-id;[in(default), out] : Move a note into or out of the archive.
 
 * d/D;note-id : Delete a note from scrybe, forever. You'll be asked to confirm
 before the note is deleted, so don't panic too much if you accidentally miss 
 type
 
-* e/E;note-id;[title];[tags] : edit a note. If title is left blank, it's kept
-unchanged. If tags are left blank, they're kept unchanged. If you don't modify
-the note body when the editor launches before saving and quitting, or if you
-totally clear the editor (save a blank file), the body will be left unchanged.
-Please note that if you pass a non-empty tag parameter, whatever string of
-comma separated tags you pass will __replace__ the old tags, not be appended to
-them. A way to tell scrybe to append instead of replace is on the todo list, and
-suggestons as to the best way to implement this are welcome (currently thinking
-if the tag parameter starts with a "+" append instead of replace)
+* e/E;note-id;[title];[tags - comma seperated list] : edit a note. If title is left blank, it's kept unchanged. If tags are left blank, they're kept unchanged. If you don't modify the note body when the editor launches before saving and quitting, or if you totally clear the editor (save a blank file), the body will be left unchanged. If you preface the comma separated tag list with a "+", the tags will be added to the already existing tags, otherwise they will overwrite the already existing tags.
 
 * g/G : Print the entire text of a note, as well as all it's metadata (title,
 tags, createTime and whether or not it's archived)

@@ -346,8 +346,8 @@ class Session:
         for tagPair in tagPairs:
              print(" | " + tagPair[0] + " : " + str(tagPair[1]) + " | ")
 
-    def dateFilter(self, choiceList):#lil present for reading the code ;)
-        #TODO -- Fix this fucking mess
+    def dateFilter(self, choiceList):
+        #TODO -- See if you can clean this up
         choiceList[1] = choiceList[1].lower()
         lowPass = time.time()
         highPass = 0
