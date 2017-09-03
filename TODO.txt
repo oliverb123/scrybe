@@ -1,10 +1,7 @@
 Immediate:
     -Write a usage section into README.md
     -Update all functions to respect archived notes    
-    -On note addition, if a tag is added that includes markup used in the
-     help message, print a warning saying that those characters aren't needed
-     for the parameter, and will be saved as a part of the tag, and so must
-     be included when trying to use the tag in a filter or search operation
+    -Re-consider tag sanity check on note addition
 
 Roadmap:
     -Some kind of time based filtering
