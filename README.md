@@ -5,6 +5,16 @@ Scrybe is a simple terminal application for taking notes, using your favourite t
 
 Don't like something, or want something? Add an issue, submit a pull request or fork the repo :). There is a todo file, but I won't promise to keep it exceptionally up to date.
 
+### Python Version Notes
+Scrybe is written in python 2, mainly because my muscle memory has mapped "run 
+this python file" to typing "python blah". There is a python3 branch, which
+will be updated sporadically with whatever features have been added since its
+last updated, but it won't be kept in lock step with the master branch.
+
+As a result of this, if your terminal has `python` aliased to python3 instead of
+python2, you'll have to either change that or modify the alias put in your 
+~/.bashrc (or your shell equivalent). Sorry.
+
 ## Setup:
 
 ```bash

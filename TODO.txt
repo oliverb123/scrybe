@@ -1,7 +1,8 @@
 Immediate:
     -Write a usage section into README.md
     -Update all functions to respect archived notes    
-
+    -Make it so that setup.py won't run twice in the same directory
+    
 Roadmap:
     -Some kind of time based filtering
     -Improved commandline input (working arrow keys ffs)
