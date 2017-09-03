@@ -1,7 +1,9 @@
 Immediate:
-    -Write a usage section into README.md
-    -Update all functions to respect archived notes    
-    -Re-consider tag sanity check on note addition
+    -Update usage section to include edit tag appending mode
+    -Update usage section to reflect archive support for filtering
+    -Update usage section to reflect date filtering support
+    -Remove archive warning from readme
+    -Add a changelog to the readme, that documents the latest changes
 
 Roadmap:
     -Some kind of time based filtering

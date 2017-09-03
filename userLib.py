@@ -151,7 +151,7 @@ class Session:
                 print("lists, and will be included as part of the tag they")
                 print("are beside, e.g [tag1, tag2] becomes ['[tag1', 'tag2]']")
                 print("in the notes tag list. If this wasn't intended, enter")
-                print("'c' to cancel, anythin else will add a note with the")
+                print("'c' to cancel, anything else will add a note with the")
                 print("tag list as it currently is")
                 confirm = raw_input("->")
                 if(confirm.lower() == "c"):
@@ -159,10 +159,7 @@ class Session:
                     return
         os.system(self.conf["editor"] + " .scrybe.tmp")
         with open(".scrybe.tmp", "r") as tmpFile:
-            body = ""
-            for line in tmpFile.readlines():
-                if(line.strip() and line.strip()[0] != "#"):
-                    body += line
+            body = tmpFile.read().strip()
         os.remove(".scrybe.tmp")
         if(not body):
             print("Note addition cancelled due to empty body")
@@ -185,7 +182,7 @@ class Session:
         printString += body
         return(printString.strip())
 
-    def archiveHandler(self, choiceList):
+    def archiveHandler(self, choiceList):#TODO - improve functionality
         if(len(choiceList) < 2):
             print("You need to specify a note to archive")
             return
@@ -220,6 +217,7 @@ class Session:
             print("Deletion cancelled")
 
     def editNote(self, choiceList):
+#boilerplate to check if the mandatory params are ther
         if(len(choiceList) < 2):
             print("You need to specify a note by id")
             return
@@ -233,23 +231,27 @@ class Session:
         except:
             print("No note found of that id (did you delete it?)")
             return
+#end of boilerplate
         newTitle = note.title
         if(len(choiceList) > 2 and choiceList[2]):
             newTitle = choiceList[2]
         oldBody = note.body
         newTags = ",".join(note.tags)
         if(len(choiceList) > 3 and choiceList[3]):
-            newTags = choiceList[3]
+            if(choiceList[3][0] == "+"):#append mode for tag modification
+                newTags += "," + choiceList[3]
+            else:#otherwise replace mode
+                newTags = choiceList[3]
         with open(".scrybe.tmp", "w") as tmpFile:
             tmpFile.write(oldBody)
         os.system(self.conf["editor"] + " .scrybe.tmp")
         with open(".scrybe.tmp", "r") as tmpFile:
-            newBody = ""
-            for line in tmpFile.readlines():
-                if(line.strip() and line.strip()[0] != "#"):
-                    newBody += line
+            newBody = tmpFile.read().strip()
+            if(not newBody):#if the user saved an empty file, cancel edit
+                print("Edit cancelled due to empty note body")
+                return
         os.remove(".scrybe.tmp")
-        if((newBody == oldBody or not newBody) and newTags == note.tags):
+        if(newBody == oldBody and newTags == note.tags):
             print("Note edit cancelled")
             return
         self.conn.editNote(noteId, newTitle, newBody, newTags)
@@ -277,7 +279,7 @@ class Session:
     def clear(self, choiceList):
         os.system("clear")
 
-    def importNote(self, choiceList):
+    def importNote(self, choiceList):#NOTE - currently hidden from the user
         if(len(choiceList) < 3):
             print("You must specify title and path when importing a file")
             return
@@ -295,21 +297,30 @@ class Session:
         self.conn.addNote(title, body, tags)
         print("Note imported")
 
-    def filter(self, choiceList):
-        if(len(choiceList) < 3):
+    def filter(self, choiceList):#function to work out filter mode; date or tag
+        if(len(choiceList) < 4):
             self.tagFilter( choiceList)
-        elif(choiceList[2].lower() not in ["t", "d"]):
-            print("Sorry, " + choiceList[2] + " isn't a valid filter option")
+        elif(choiceList[3].lower() not in ["t", "d"]):
+            print("Sorry, " + choiceList[3] + " isn't a valid filter mode")
         else:
             filterMatch = {"t":self.tagFilter, "d":self.dateFilter}
-            filterMatch[choiceList[2].lower()](choiceList)
+            filterMatch[choiceList[3].lower()](choiceList)
 
-    def tagFilter(self, choiceList):
+    def tagFilter(self, choiceList):#current default filter type
         if(len(choiceList) < 2 or not choiceList[1]):
-            print("You need to supply atleast one tag to filter by")
+            print("You need to supply at least one tag to filter by")
+            return
+        if(len(choiceList) > 2 and choiceList[2]):#choose note get mode
+            modeSelector = {"a":"archived", "b":"all", "c":"current"}
+            if(choiceList[2] not in modeSelector.keys()):
+                print("Sorry, " + choiceList[2] + " isn't a valid option")
+                return
+            mode = modeSelector[choiceList[2]]
+        else:
+            mode = modeSelector["c"]
         tagList = choiceList[1].split(",")
         tagList = map(lambda x: x.strip(), tagList)
-        notes = self.conn.getNotes()
+        notes = self.conn.getNotes(mode)
         printString = ""
         for note in notes:
             matchingTags = [tag for tag in tagList if tag in note.tags]
@@ -319,7 +330,7 @@ class Session:
             printString = "Sorry, nothing matching that filter found"
         print(printString.strip())
 
-    def getTags(self, choiceList):
+    def getTags(self, choiceList):#NOTE - should this have archive selector?
         notes = self.conn.getNotes()
         tagPairs = []
         for note in notes:
@@ -335,7 +346,7 @@ class Session:
         for tagPair in tagPairs:
              print(" | " + tagPair[0] + " : " + str(tagPair[1]) + " | ")
 
-    def dateFilter(self, choiceList):#lil present for reading the code ;)-TODO
+    def dateFilter(self, choiceList):#lil present for reading the code ;)
         #TODO -- Fix this fucking mess
         choiceList[1] = choiceList[1].lower()
         lowPass = time.time()
@@ -361,7 +372,15 @@ class Session:
             return
         if(not highPass):
             highPass = time.time()
-        notes = self.conn.getNotes()
+        modeSelector = {"a":"archived", "b":"all", "c":"current"}
+        mode = "current"
+        if(choiceList[2]):
+            if(choiceList[2] in modeSelector.keys()):
+                mode = modeSelector[choiceList[2]]
+            else:
+                print("Sorry, " + choiceList[2] + " isn't a valid option")
+                return
+        notes = self.conn.getNotes(mode)
         if(not notes):
             print("You don't have any notes to filter")
         matchingNotes = []
