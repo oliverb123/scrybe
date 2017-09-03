@@ -310,8 +310,8 @@ class Session:
         if(len(choiceList) < 2 or not choiceList[1]):
             print("You need to supply at least one tag to filter by")
             return
+        modeSelector = {"a":"archived", "b":"all", "c":"current"}
         if(len(choiceList) > 2 and choiceList[2]):#choose note get mode
-            modeSelector = {"a":"archived", "b":"all", "c":"current"}
             if(choiceList[2] not in modeSelector.keys()):
                 print("Sorry, " + choiceList[2] + " isn't a valid option")
                 return
@@ -357,8 +357,8 @@ class Session:
                       "quarter":60*60*24*7*31*3,
                       "year":60*60*24*365}#hazy second-to-keyword mapping
         singleDate = "\d\d/\d\d\/\d\d\d\d"
-        singleDateRe = re.compile(singleDate)
-        doubleDateRe = re.compile(singleDate + ":" + singleDate)
+        singleDateRe = re.compile("^"+singleDate+"$")
+        doubleDateRe = re.compile("^"+singleDate + ":" + singleDate+"$")
         if(choiceList[1] in keywordMap.keys()):
             lowPass -= keywordMap[choiceList[1]]
         elif(singleDateRe.match(choiceList[1])):
@@ -366,7 +366,7 @@ class Session:
         elif(doubleDateRe.match(choiceList[1])):
             dates = choiceList[1].split(":")
             lowPass = time.mktime(time.strptime(dates[0], "%d/%m/%Y"))
-            highPass = time.mktime(time.strptime(choiceList[1], "%d/%m/%Y"))
+            highPass = time.mktime(time.strptime(dates[1], "%d/%m/%Y"))
         else:
             print("Sorry, that date format isn't valid")
             return
