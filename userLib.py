@@ -146,6 +146,17 @@ class Session:
         tags = ""
         if(len(choiceList) > 2):
             tags = choiceList[2]
+            if([char for char in ["(", ")", "[", "]"] if char in tags]):
+                print("Brackets (square and rounded) aren't needed for tag")
+                print("lists, and will be included as part of the tag they")
+                print("are beside, e.g [tag1, tag2] becomes ['[tag1', 'tag2]']")
+                print("in the notes tag list. If this wasn't intended, enter")
+                print("'c' to cancel, anythin else will add a note with the")
+                print("tag list as it currently is")
+                confirm = raw_input("->")
+                if(confirm.lower() == "c"):
+                    print("Note addition cancelled")
+                    return
         os.system(self.conf["editor"] + " .scrybe.tmp")
         with open(".scrybe.tmp", "r") as tmpFile:
             body = ""

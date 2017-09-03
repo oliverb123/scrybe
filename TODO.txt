@@ -1,8 +1,11 @@
 Immediate:
     -Write a usage section into README.md
     -Update all functions to respect archived notes    
-    -Make it so that setup.py won't run twice in the same directory
-    
+    -On note addition, if a tag is added that includes markup used in the
+     help message, print a warning saying that those characters aren't needed
+     for the parameter, and will be saved as a part of the tag, and so must
+     be included when trying to use the tag in a filter or search operation
+
 Roadmap:
     -Some kind of time based filtering
     -Improved commandline input (working arrow keys ffs)
