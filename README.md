@@ -1,4 +1,4 @@
-![Demo of Scrybe](docs/demo.gif)
+![Demo of Scrybe](docs/updated-demo.gif)
 
 # Scrybe
 Scrybe is a simple terminal application for taking notes, using your favourite terminal editor, and storing them in an sqlite database. Notes consist of a title, a body and a set of comma separated tags that can be used to sort them however you like. Scrybe includes a search function at the minute, and a filtering function to allow you to view all the notes of a certain tag will be added when I get around to it.
