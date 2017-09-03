@@ -1,6 +1,4 @@
 Immediate:
-    -Completely re-write help command
-    -Remove archive warning from readme
     -Add a changelog to the readme, that documents the latest changes
 
 Roadmap:

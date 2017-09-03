@@ -29,20 +29,20 @@ class Session:
 
 
     def displayHelp(self, choiceList=None):
-        print("Key: mandatory, [optional], (explanatory - do not include)")
+        print("Check the README.md file for command references")
         print("Options as follows:")
         print("h/H : Display this message")
-        print("l/L;[c(urrent - default), a(rchived), b(oth)] : List notes")
-        print("t/T : List your tags, and the number of notes each contains")
-        print("s/S;search-string;[c(urrent - default), a(rchived), b(oth)] : Search notes")
-        print("f/F;tag1[,tag2,...] : List only notes with all tags given")
-        print("a/A;title;[tags - comma-separated] : add a note")
+        print("l/L : List notes")
+        print("t/T : List tags, and the number of notes each contains")
+        print("s/S : Search notes")
+        print("f/F : Filter notes")
+        print("a/A : Add a note")
 #        print("i/I;title;/path/to/file;[tags] : import a note from file")
-        print("arch;note-id;[in - default/out] : move a note into or out of archive")
-        print("d/D;note-id : delete a note forever")
-        print("e/E;note-id;[title];[tags] : Edit a note that already exists - save an empty file to cancel")
-        print("g/G;note-id : View a specific note")
-        print("c/C: Clear screen")
+        print("arch : Move a note into or out of archive")
+        print("d/D : Delete a note forever")
+        print("e/E : Edit a note that already exists - save an empty file to cancel")
+        print("g/G : View a specific note")
+        print("c/C : Clear screen")
         print("q/Q : Quit Scrybe")
 
     def parseInput(self, choiceString):
