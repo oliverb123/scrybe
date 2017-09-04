@@ -1,5 +1,6 @@
 Immediate:
     -Add a changelog to the readme, that documents the latest changes
+    -Write documentation of how the dump command works in README.md
     -Make setup.py try to import old notes if it finds a scrybe.db file
         -Make upgrade to new release process more seamless
 

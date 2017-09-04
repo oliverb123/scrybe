@@ -41,6 +41,7 @@ class Session:
         print("arch : Move a note into or out of archive")
         print("d/D : Delete a note forever")
         print("e/E : Edit a note that already exists - save an empty file to cancel")
+        print("exp : Export a note to a file")
         print("g/G : View a specific note")
         print("c/C : Clear screen")
         print("q/Q : Quit Scrybe")
@@ -64,7 +65,8 @@ class Session:
                        "c":self.clear,
                        "f":self.filter,
                        "t":self.getTags,
-                       "q":self.quit}
+                       "q":self.quit,
+                       "exp":self.export}
         if(choiceList[0] not in choiceFuncs.keys()):
             print("Sorry, " + choiceList[0] + " isn't a valid command (enter 'h' for help)")
             return
@@ -392,4 +394,34 @@ class Session:
         for note in matchingNotes:
             printString += self.oneLineStringGen(note)
         print(printString.strip())
+
+    def export(self, choiceList):#dumps the body of a note into a file
+        if(len(choiceList) < 2 or not choiceList[1]):
+            print("Sorry, you need to specify a note id")
+            return
+        try:
+            noteId = int(choiceList[1])
+        except:
+            print("Sorry, note id needs to be an integer")
+            return
+        try:
+            note = self.conn.getNote(noteId)
+        except IndexError:
+            print("Sorry, that note doesn't exist (did you delete it?)")
+            return
+        fileName = note.title
+        if(len(choiceList) > 2 and choiceList[2]):
+            fileName = choiceList[2]
+        fileText = ""
+        fileText += note.title + " | "
+        fileText += time.strftime("%d/%m/%Y %H:%M", time.localtime(note.createTime))
+        fileText += " | "
+        for tag in note.tags:
+            fileText += tag + " | "
+        fileText = fileText[:-3]
+        fileText += "\n\n"
+        fileText += note.body
+        with open(fileName, "w") as exportFile:
+            exportFile.write(fileText)
+        print("Note exported to " + fileName)
 
