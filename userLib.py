@@ -241,7 +241,7 @@ class Session:
         newTags = ",".join(note.tags)
         if(len(choiceList) > 3 and choiceList[3]):
             if(choiceList[3][0] == "+"):#append mode for tag modification
-                newTags += "," + choiceList[3]
+                newTags += "," + choiceList[3][1:]
             else:#otherwise replace mode
                 newTags = choiceList[3]
         with open(".scrybe.tmp", "w") as tmpFile:
