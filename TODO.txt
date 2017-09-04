@@ -2,7 +2,6 @@ Immediate:
     -Add a changelog to the readme, that documents the latest changes
 
 Roadmap:
-    -Some kind of time based filtering
     -Improved commandline input (working arrow keys ffs)
     -Database encryption? Maybe
 
