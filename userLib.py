@@ -412,6 +412,10 @@ class Session:
         fileName = note.title
         if(len(choiceList) > 2 and choiceList[2]):
             fileName = choiceList[2]
+        if(fileName[0] == "~"):
+            fileName = os.environ["HOME"] + fileName[1:]
+        if(fileName[-1] == "/"):
+            fileName += note.title
         fileText = ""
         fileText += note.title + " | "
         fileText += time.strftime("%d/%m/%Y %H:%M", time.localtime(note.createTime))
@@ -421,7 +425,12 @@ class Session:
         fileText = fileText[:-3]
         fileText += "\n\n"
         fileText += note.body
-        with open(fileName, "w") as exportFile:
-            exportFile.write(fileText)
+        try:
+            with open(fileName, "w") as exportFile:
+                exportFile.write(fileText)
+        except:
+            print("Sorry, scrybe couldn't open " + fileName)
+            print("Are you sure it exists?")
+            return
         print("Note exported to " + fileName)
 

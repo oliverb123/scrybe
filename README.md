@@ -81,7 +81,9 @@ changing, so if you have a suggestion feel free to open an issue!
 before the note is deleted, so don't panic too much if you accidentally miss 
 type
 
-* e/E;note-id;[title];[tags - comma seperated list] : edit a note. If title is left blank, it's kept unchanged. If tags are left blank, they're kept unchanged. If you don't modify the note body when the editor launches before saving and quitting, or if you totally clear the editor (save a blank file), the body will be left unchanged. If you preface the comma separated tag list with a "+", the tags will be added to the already existing tags, otherwise they will overwrite the already existing tags.
+* e/E;note-id;[title];[tags - comma seperated list] : Edit a note. If title is left blank, it's kept unchanged. If tags are left blank, they're kept unchanged. If you don't modify the note body when the editor launches before saving and quitting, or if you totally clear the editor (save a blank file), the body will be left unchanged. If you preface the comma separated tag list with a "+", the tags will be added to the already existing tags, otherwise they will overwrite the already existing tags.
+
+* exp;note-id;[path or filename] : Export a note to a specified path. If you leave out the filename, the note will be exported to the current working directory as a file called whatever the of the note is. If you start the path with ~, it will be replaced with /home/whatever-your-username-is. If the path ends in / instead of a file name, the file is created in that directory, and called whatever the note title is.
 
 * g/G : Print the entire text of a note, as well as all it's metadata (title,
 tags, createTime and whether or not it's archived)
