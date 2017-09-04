@@ -1,5 +1,7 @@
 Immediate:
     -Add a changelog to the readme, that documents the latest changes
+    -Make setup.py try to import old notes if it finds a scrybe.db file
+        -Make upgrade to new release process more seamless
 
 Roadmap:
     -Some kind of time based filtering
