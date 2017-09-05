@@ -13,8 +13,10 @@ class Note:
 class ConnectionHandler:
     def __init__(self, dbName="scrybe.db"):
         self.dbName = dbName
-        self.conn = sql.connect(self.dbName)
     
+    def connect(self):
+        self.conn = sql.connect(self.dbName)
+
     def __del__(self):
         self.conn.commit()
         self.conn.close()

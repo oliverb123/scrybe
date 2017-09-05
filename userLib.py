@@ -13,6 +13,7 @@ class Session:
             global AES
             from Crypto.Cipher import AES
             self.decrypt(self.conn.dbName)
+        self.conn.connect()
 
     def getConfig(self):
         conf = {"editor":"vim",
@@ -28,7 +29,8 @@ class Session:
                     if(key.strip().lower() not in ["iv",]):
                         conf[key.strip().lower()] = val.strip().lower()
                     else:
-                        conf[key.strip().lower()] = val.strip()
+                        if(key.strip().lower() == "iv"):
+                            conf[key.strip().lower()] = val[:-1]
         return(conf)
 
     def start(self):
@@ -446,35 +448,39 @@ class Session:
         print("Note exported to " + fileName)
 
     def encrypt(self, dbName):
-        iv = self.conf[iv]
+        iv = self.iv
         userPass = self.userPass#use passphrase hash generated on decryption
         with open(dbName, "rb") as plainFile:
             plainText = iv + plainFile.read()
         os.rename(dbName, dbName + ".bak")
         while(len(plainText) % 16 != 0):
             plainText += " "
-        encText = AES.new(userPass, AES.MODE_CBC, iv).encrypt(plainText)
+        encText = iv + AES.new(userPass, AES.MODE_CBC, iv).encrypt(plainText)
         with open(dbName + ".enc", "wb") as encFile:
             encFile.write(encText)
         os.remove(dbName + ".bak")#NOTE - only remove backup after write
     
     def decrypt(self, dbName):
-        iv = self.conf["iv"]
         userPass = hasher(raw_input("Enter passphrase: "))
         with open(dbName + ".enc", "rb") as encFile:
             encText = encFile.read()
+        iv = encText[:16]#pull iv from front of ciphertext
+        encText = encText[16:]#strip iv from cipherText
         plainText = AES.new(userPass, AES.MODE_CBC, iv).decrypt(encText)
         if(plainText[0:16] != iv):
             print("Decryption failed, likely due to a wrong password.")
-            choice = raw_input("Try again(y/n)? ").strip().lower()
-            if(choice == "y"):
-                self.decrypt(dbName)#finally got to use some recursion woo!!
-            else:
-                print("Exiting")
-                sys.exit()
+            print("Exiting")
+            sys.exit()
+        #remove padding
+        while(plainText[-1] == " "):
+            plainText = plainText[:-1]
+        self.iv = iv#Store iv for encrpytion later
         self.userPass = userPass#Store good userpass for encryption later
+        if(os.path.exists(dbName)):
+            os.remove(dbName)
         with open(dbName, "wb") as plainFile:
             plainFile.write(plainText[16:])
+            plainFile.flush()
 
     
 def hasher(plain):

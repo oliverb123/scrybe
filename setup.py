@@ -73,7 +73,7 @@ def main():
         print("Your notes CANNOT be retrieved if you lose it")
         userpass1 = ""
         userpass2 = ""
-        while(userpass1 != userpass2 or len(userpass1) < 4):
+        while(userpass1 != userpass2 or len(userpass1) <= 4):
             userpass1 = raw_input("Passphrase: ")
             userpass2 = raw_input("Repeat passphrase: ")
             if(userpass1 != userpass2):
@@ -81,7 +81,7 @@ def main():
                 print("Please try again, or hit control-c")
                 print("to finish setup without database encryption")
         userPass = hasher(userpass1)
-        iv = hasher(Random.new().read(16))#NOTE - random iv gen
+        iv = Random.new().read(16)
         with open(cwd + "scrybe.db", "rb") as plainFile:
             plainText = iv + plainFile.read()#NOTE - iv used to verify decrypt
         while(len(plainText) % 16 != 0):
@@ -89,11 +89,10 @@ def main():
         os.rename(cwd + "scrybe.db", cwd + "scrybe.db.bak")
         encrypter = AES.new(userPass, AES.MODE_CBC, iv)
         with open(cwd + "scrybe.db.enc", "wb") as encFile:
-            encFile.write(encrypter.encrypt(plainText))
+            encFile.write(iv + encrypter.encrypt(plainText))#iv prepended to ciphertext
         os.remove(cwd + "scrybe.db.bak")#NOTE - only remove backup after write
         with open(cwd + ".scrybe.conf", "a") as configFile:
             configFile.write("encrypted:true\n")
-            configFile.write("iv:" + iv + "\n")#write iv to config file
 
 def hasher(plain):
     i = 0
