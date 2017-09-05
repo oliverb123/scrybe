@@ -34,17 +34,16 @@ def main():
     with open(cwd + "dbLib.py", "w") as newDbLib:
         newDbLib.write(newDbLibString)
         newDbLib.close()
-    #editor choice
-    editor = ""
-    while(editor not in ["vim", "emacs", "nano"]):
-        editor = raw_input("Vim, emacs or nano?: ").strip().lower()
-    #reate config file and re-write userLib to account for new config location
-    with open(cwd + ".scrybe.conf", "a") as configFile:
-        configFile.write("editor:" + editor + "\n")
-
+    if(not os.path.exists(cwd + ".scrybe.conf")):#only setup config if needed
+        #editor choice
+        editor = ""
+        while(editor not in ["vim", "emacs", "nano"]):
+            editor = raw_input("Vim, emacs or nano?: ").strip().lower()
+        with open(cwd + ".scrybe.conf", "a") as configFile:
+            configFile.write("editor:" + editor + "\n")
+#re-write userlib for new config location
     with open(cwd + "userLib.py", "r") as userLib:
         userLibString = userLib.read().replace(".scrybe.conf", cwd + ".scrybe.conf")
-
     with open(cwd + "userLib.py", "w") as userLib:
         userLib.write(userLibString)
 
