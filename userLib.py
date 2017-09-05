@@ -288,7 +288,8 @@ class Session:
         print(self.fullStringGen(note))
 
     def quit(self, choiceList):
-        self.encrypt(self.conn.dbName)
+        if(self.conf["encrypted"] == "true"):
+           self.encrypt(self.conn.dbName)
         self.choice = "q"
 
     def clear(self, choiceList):

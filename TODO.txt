@@ -1,9 +1,6 @@
 Immediate:
     -Review database encryption code:
         -Clean up implementation
-        -Generally stop writing encryption code at three in the morning
-            -I guess this point should probably be in ongoing, not immediate
-            -Or maybe roadmap. Hmmmm :/
     -Add a changelog to the readme, that documents the latest changes
 
 Roadmap:
