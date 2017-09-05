@@ -5,20 +5,14 @@ import hashlib
 
 def main():
     cwd = os.getcwd() + "/"
-    if(os.path.exists(cwd + "scrybe.db")):
-        print("Oops, setup.py has already run in this directory")
-        print("")
-        print("To re-install, make a clean clone of the scrybe repo and")
-        print("remove the alias from your ~/.bashrc (or whichever), then")
-        print("run 'python setup.py' again.")
-        return
-
-    conn = sql.connect(cwd + "scrybe.db")
-    c = conn.cursor()
-    command = "CREATE TABLE notes (id INTEGER PRIMARY KEY, title TEXT NOT NULL, body TEXT NOT NULL, createTime REAL NOT NULL, archived INTEGER NOT NULL, tags TEXT NOT NULL)"
-    c.execute(command)
-    conn.commit()
-    conn.close()
+    #make database if it isn't present
+    if(not os.path.exists(cwd + "scrybe.db")):
+        conn = sql.connect(cwd + "scrybe.db")
+        c = conn.cursor()
+        command = "CREATE TABLE notes (id INTEGER PRIMARY KEY, title TEXT NOT NULL, body TEXT NOT NULL, createTime REAL NOT NULL, archived INTEGER NOT NULL, tags TEXT NOT NULL)"
+        c.execute(command)
+        conn.commit()
+        conn.close()
 
     #add needed shell file extensions to list
     shellFiles = [".zshrc", ".bashrc"]
@@ -33,18 +27,18 @@ def main():
     if(not aliased):
         with open(os.environ["HOME"] + "/.bashrc", "a+") as rcFile:
             rcFile.write("alias scrybe='python " + cwd + "scrybe.py" + "'\n")
-
+    #re-write dbLib to account for new db location
     with open(cwd + "dbLib.py", "r") as oldDbLib:
         newDbLibString = oldDbLib.read().replace("scrybe.db", cwd + "scrybe.db")
 
     with open(cwd + "dbLib.py", "w") as newDbLib:
         newDbLib.write(newDbLibString)
         newDbLib.close()
-
+    #editor choice
     editor = ""
     while(editor not in ["vim", "emacs", "nano"]):
         editor = raw_input("Vim, emacs or nano?: ").strip().lower()
-
+    #reate config file and re-write userLib to account for new config location
     with open(cwd + ".scrybe.conf", "a") as configFile:
         configFile.write("editor:" + editor + "\n")
 
