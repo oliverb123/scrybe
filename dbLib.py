@@ -12,14 +12,16 @@ class Note:
 
 class ConnectionHandler:
     def __init__(self, dbName="scrybe.db"):
+        self.conn = None
         self.dbName = dbName
     
     def connect(self):
         self.conn = sql.connect(self.dbName)
 
     def __del__(self):
-        self.conn.commit()
-        self.conn.close()
+        if(self.conn):
+            self.conn.commit()
+            self.conn.close()
 
     def getNotes(self, mode="current"):
         command = "SELECT * FROM notes "
