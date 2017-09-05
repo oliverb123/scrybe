@@ -1,9 +1,18 @@
 Immediate:
+    -Review database encryption code:
+        -Clean up implementation
+        -Make it safer as regards sudden script failure
+        -Improve library detection maybe
+        -Add random iv's and read them from config file
+        -Reconsider password hashing function
+        -Generally stop writing encryption code at three in the morning
+            -I guess this point should probably be in ongoing, not immediate
+            -Or maybe roadmap. Hmmmm :/
     -Add a changelog to the readme, that documents the latest changes
 
 Roadmap:
+    -Potentially build a gui web app? Maybe. I've walked this road before
     -Improved commandline input (working arrow keys ffs)
-    -Database encryption? Maybe
 
 Ongoing:
     -Keep tweaking search algorithm weights

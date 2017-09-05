@@ -1,15 +1,22 @@
 import os
+import sys
 import dbLib
 import time
 import re
+import hashlib
 
 class Session:
     def __init__(self):
         self.conn = dbLib.ConnectionHandler()
         self.conf = self.getConfig()
+        if(self.conf["encrypted"] == "true"):
+            global AES
+            from Crypto.Cipher import AES
+            self.decrypt(self.conn.dbName)
 
     def getConfig(self):
-        conf = {}
+        conf = {"editor":"vim",
+                "encrypted":"false"}
         with open(".scrybe.conf", "r") as configFile:
             for line in configFile.readlines():
                 if(line.strip() and line.strip()[0] != "#"):
@@ -17,7 +24,7 @@ class Session:
                         key, val = line.split(":")
                     except:
                         continue
-                    conf[key.strip()] = val.strip()
+                    conf[key.strip().lower()] = val.strip().lower()
         return(conf)
 
     def start(self):
@@ -276,6 +283,7 @@ class Session:
         print(self.fullStringGen(note))
 
     def quit(self, choiceList):
+        self.encrypt(self.conn.dbName)
         self.choice = "q"
 
     def clear(self, choiceList):
@@ -434,3 +442,47 @@ class Session:
             return
         print("Note exported to " + fileName)
 
+    def encrypt(self, dbName):
+        iv = "1234567891234567"#TODO - read iv from config - generated on setup
+        userpass1 = ""
+        userpass2 = ""
+        while(userpass1 != userpass2 or len(userpass1) < 4):
+            userpass1 = raw_input("Enter Passphrase: ")
+            userpass2 = raw_input("Repeat Passphrase: ")
+            if(userpass1 != userpass2):
+                print("Those passwords don't match, please try again")
+        userPass = hasher(userpass1)
+        with open(dbName, "rb") as plainFile:
+            plainText = "scrybe" + plainFile.read()
+        os.rename(dbName, dbName + ".bak")
+        while(len(plainText) % 16 != 0):
+            plainText += " "
+        encText = AES.new(userPass, AES.MODE_CBC, iv).encrypt(plainText)
+        with open(dbName + ".enc", "wb") as encFile:
+            encFile.write(encText)
+        os.remove(dbName + ".bak")#TODO - Is this the safest way to handle this?
+    
+    def decrypt(self, dbName):
+        iv = "1234567891234567"#TODO - Read if from self.config
+        userPass = hasher(raw_input("Enter passphrase: "))
+        with open(dbName + ".enc", "rb") as encFile:
+            encText = encFile.read()
+        plainText = AES.new(userPass, AES.MODE_CBC, iv).decrypt(encText)
+        if(plainText[0:6] != "scrybe"):#TODO - Consider prepending iv instead
+            print("Decryption failed, likely due to a wrong password.")
+            choice = raw_input("Try again(y/n)? ").strip().lower()
+            if(choice == "y"):
+                self.decrypt(dbName)#finally got to use some recursion woo
+            else:
+                print("Exiting")
+                sys.exit()
+        with open(dbName, "wb") as plainFile:
+            plainFile.write(plainText[6:])
+
+    
+def hasher(plain):
+    i = 0
+    while(i < 64000):
+        plain = hashlib.md5(plain).hexdigest()#TODO - Think about hashing algo
+        i += 1
+    return(plain)
