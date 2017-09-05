@@ -58,17 +58,17 @@ def main():
     crypto = raw_input("Encrypt note database at rest(y/n)?: ").strip().lower()
     if(crypto == "y"):
         try:
-            from Crypto.Cipher import AES#TODO - Is this good library checking?
+            from Crypto.Cipher import AES#NOTE - Minimum viable library check
+            from Crypto import Random
         except:
             print("Database encryption relies on the pyCrypto library")
             print("To install it run 'sudo pip install pycrypto'")
             install = raw_input("Do that now? (requires pip)(y/n): ").strip().lower()
-            if(install == "y"):#TODO - Is there a better way of doing this?
+            if(install == "y"):#NOTE - Assumes user has pip installed - rethink
                 os.system("sudo pip install pycrypto")
             else:
                 print("Continuing without database encryption")
                 return
-        #TODO - Is there a cleaner way to do password setting?
         print("Enter a passphrase, and keep it somewhere safe")
         print("Your notes CANNOT be retrieved if you lose it")
         userpass1 = ""
@@ -81,24 +81,24 @@ def main():
                 print("Please try again, or hit control-c")
                 print("to finish setup without database encryption")
         userPass = hasher(userpass1)
+        iv = hasher(Random.new().read(16))#NOTE - random iv gen
         with open(cwd + "scrybe.db", "rb") as plainFile:
-            plainText = "scrybe" + plainFile.read()#TODO - Prepend iv instead
+            plainText = iv + plainFile.read()#NOTE - iv used to verify decrypt
         while(len(plainText) % 16 != 0):
             plainText += " "
         os.rename(cwd + "scrybe.db", cwd + "scrybe.db.bak")
-        iv = "1234567891234567"#TODO - Generate random 16 or better 32 byte iv
         encrypter = AES.new(userPass, AES.MODE_CBC, iv)
         with open(cwd + "scrybe.db.enc", "wb") as encFile:
             encFile.write(encrypter.encrypt(plainText))
-        os.remove(cwd + "scrybe.db.bak")#TODO - Is this the best/safest time?
+        os.remove(cwd + "scrybe.db.bak")#NOTE - only remove backup after write
         with open(cwd + ".scrybe.conf", "a") as configFile:
             configFile.write("encrypted:true\n")
-            configFile.write("iv:" + iv + "\n")
+            configFile.write("iv:" + iv + "\n")#write iv to config file
 
 def hasher(plain):
     i = 0
     while(i < 64000):
-        plain = hashlib.md5(plain).hexdigest()#TODO - Think about hashing algo
+        plain = hashlib.sha256(plain).digest()
         i += 1
     return(plain)
 

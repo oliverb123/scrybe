@@ -16,7 +16,8 @@ class Session:
 
     def getConfig(self):
         conf = {"editor":"vim",
-                "encrypted":"false"}
+                "encrypted":"false",
+                "iv":"1234567891234567"}
         with open(".scrybe.conf", "r") as configFile:
             for line in configFile.readlines():
                 if(line.strip() and line.strip()[0] != "#"):
@@ -24,7 +25,10 @@ class Session:
                         key, val = line.split(":")
                     except:
                         continue
-                    conf[key.strip().lower()] = val.strip().lower()
+                    if(key.strip().lower() not in ["iv",]):
+                        conf[key.strip().lower()] = val.strip().lower()
+                    else:
+                        conf[key.strip().lower()] = val.strip()
         return(conf)
 
     def start(self):
@@ -33,7 +37,6 @@ class Session:
         while(self.choice.lower() != "q"):
             self.choice = raw_input("->")
             self.parseInput(self.choice)
-
 
     def displayHelp(self, choiceList=None):
         print("Check the README.md file for command references")
@@ -443,46 +446,40 @@ class Session:
         print("Note exported to " + fileName)
 
     def encrypt(self, dbName):
-        iv = "1234567891234567"#TODO - read iv from config - generated on setup
-        userpass1 = ""
-        userpass2 = ""
-        while(userpass1 != userpass2 or len(userpass1) < 4):
-            userpass1 = raw_input("Enter Passphrase: ")
-            userpass2 = raw_input("Repeat Passphrase: ")
-            if(userpass1 != userpass2):
-                print("Those passwords don't match, please try again")
-        userPass = hasher(userpass1)
+        iv = self.conf[iv]
+        userPass = self.userPass#use passphrase hash generated on decryption
         with open(dbName, "rb") as plainFile:
-            plainText = "scrybe" + plainFile.read()
+            plainText = iv + plainFile.read()
         os.rename(dbName, dbName + ".bak")
         while(len(plainText) % 16 != 0):
             plainText += " "
         encText = AES.new(userPass, AES.MODE_CBC, iv).encrypt(plainText)
         with open(dbName + ".enc", "wb") as encFile:
             encFile.write(encText)
-        os.remove(dbName + ".bak")#TODO - Is this the safest way to handle this?
+        os.remove(dbName + ".bak")#NOTE - only remove backup after write
     
     def decrypt(self, dbName):
-        iv = "1234567891234567"#TODO - Read if from self.config
+        iv = self.conf["iv"]
         userPass = hasher(raw_input("Enter passphrase: "))
         with open(dbName + ".enc", "rb") as encFile:
             encText = encFile.read()
         plainText = AES.new(userPass, AES.MODE_CBC, iv).decrypt(encText)
-        if(plainText[0:6] != "scrybe"):#TODO - Consider prepending iv instead
+        if(plainText[0:16] != iv):
             print("Decryption failed, likely due to a wrong password.")
             choice = raw_input("Try again(y/n)? ").strip().lower()
             if(choice == "y"):
-                self.decrypt(dbName)#finally got to use some recursion woo
+                self.decrypt(dbName)#finally got to use some recursion woo!!
             else:
                 print("Exiting")
                 sys.exit()
+        self.userPass = userPass#Store good userpass for encryption later
         with open(dbName, "wb") as plainFile:
-            plainFile.write(plainText[6:])
+            plainFile.write(plainText[16:])
 
     
 def hasher(plain):
     i = 0
     while(i < 64000):
-        plain = hashlib.md5(plain).hexdigest()#TODO - Think about hashing algo
+        plain = hashlib.sha256(plain).digest()
         i += 1
     return(plain)
