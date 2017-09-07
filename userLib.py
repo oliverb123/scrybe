@@ -258,7 +258,7 @@ class Session:
                 newTags = choiceList[3]
         with open(".scrybe.tmp", "w") as tmpFile:
             tmpFile.write(oldBody)
-        os.system(os.path.join(self.conf["editor"], " .scrybe.tmp"))
+        os.system(self.conf["editor"] + " .scrybe.tmp")
         with open(".scrybe.tmp", "r") as tmpFile:
             newBody = tmpFile.read().strip()
             if(not newBody):#if the user saved an empty file, cancel edit
