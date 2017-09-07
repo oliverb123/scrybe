@@ -5,6 +5,11 @@ import time
 import re
 import hashlib
 
+try:
+    import readline
+except:
+    pass
+
 class Session:
     def __init__(self):
         self.conn = dbLib.ConnectionHandler()
