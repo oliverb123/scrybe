@@ -258,7 +258,7 @@ class Session:
                 newTags = choiceList[3]
         with open(".scrybe.tmp", "w") as tmpFile:
             tmpFile.write(oldBody)
-        os.system(self.conf["editor"] + " .scrybe.tmp")
+        os.system(os.path.join(self.conf["editor"], " .scrybe.tmp"))
         with open(".scrybe.tmp", "r") as tmpFile:
             newBody = tmpFile.read().strip()
             if(not newBody):#if the user saved an empty file, cancel edit
@@ -427,9 +427,9 @@ class Session:
         if(len(choiceList) > 2 and choiceList[2]):
             fileName = choiceList[2]
         if(fileName[0] == "~"):
-            fileName = os.environ["HOME"] + fileName[1:]
+            fileName = os.path.join(os.environ["HOME"], fileName[1:])
         if(fileName[-1] == "/"):
-            fileName += note.title
+            fileName = os.path.join(fileName, note.title)
         fileText = ""
         fileText += note.title + " | "
         fileText += time.strftime("%d/%m/%Y %H:%M", time.localtime(note.createTime))
@@ -453,17 +453,17 @@ class Session:
         userPass = self.userPass#use passphrase hash generated on decryption
         with open(dbName, "rb") as plainFile:
             plainText = iv + plainFile.read()
-        os.rename(dbName, dbName + ".bak")
+        os.rename(dbName, os.path.join(dbName, ".bak"))
         while(len(plainText) % 16 != 0):
             plainText += " "
         encText = iv + AES.new(userPass, AES.MODE_CBC, iv).encrypt(plainText)
-        with open(dbName + ".enc", "wb") as encFile:
+        with open(os.path.join(dbName, ".enc"), "wb") as encFile:
             encFile.write(encText)
         os.remove(dbName + ".bak")#NOTE - only remove backup after write
     
     def decrypt(self, dbName):
         userPass = hasher(raw_input("Enter passphrase: "))
-        with open(dbName + ".enc", "rb") as encFile:
+        with open(os.path.join(dbName, ".enc"), "rb") as encFile:
             encText = encFile.read()
         iv = encText[:16]#pull iv from front of ciphertext
         encText = encText[16:]#strip iv from cipherText

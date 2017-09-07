@@ -4,10 +4,11 @@ import os
 import hashlib
 
 def main():
-    cwd = os.getcwd() + "/"
+    cwd = os.getcwd()
     #make database if it isn't present
-    if(not os.path.exists(cwd + "scrybe.db")):
-        conn = sql.connect(cwd + "scrybe.db")
+    dbPath = os.path.join(cwd, "scrybe.db")
+    if(not os.path.exists(dbPath)):
+        conn = sql.connect(dbPath)
         c = conn.cursor()
         command = "CREATE TABLE notes (id INTEGER PRIMARY KEY, title TEXT NOT NULL, body TEXT NOT NULL, createTime REAL NOT NULL, archived INTEGER NOT NULL, tags TEXT NOT NULL)"
         c.execute(command)
@@ -19,32 +20,32 @@ def main():
     aliased = False
     for fileName in shellFiles:
         #used so we can default to .bashrc on the off chance no .*rc file exists
-        fullName = os.environ["HOME"] + "/" + fileName
+        fullName = os.path.join(os.environ["HOME"], fileName)
         if(os.path.exists(fullName)):
             with open(fullName, "a+") as rcFile:
-                rcFile.write("alias scrybe='python " + cwd + "scrybe.py" + "'\n")
+                rcFile.write("alias scrybe='python " + os.path.join(cwd, "scrybe.py") + "'\n")
             aliased = True
     if(not aliased):
-        with open(os.environ["HOME"] + "/.bashrc", "a+") as rcFile:
-            rcFile.write("alias scrybe='python " + cwd + "scrybe.py" + "'\n")
+        with open(os.path.join(os.environ["HOME"], ".bashrc"), "a+") as rcFile:
+            rcFile.write("alias scrybe='python " + os.path.join(cwd, "scrybe.py") + "'\n")
     #re-write dbLib to account for new db location
-    with open(cwd + "dbLib.py", "r") as oldDbLib:
-        newDbLibString = oldDbLib.read().replace("scrybe.db", cwd + "scrybe.db")
+    with open(os.path.join(cwd,"dbLib.py"), "r") as oldDbLib:
+        newDbLibString = oldDbLib.read().replace("scrybe.db", dbPath)
 
-    with open(cwd + "dbLib.py", "w") as newDbLib:
+    with open(os.path.join(cwd, "dbLib.py"), "w") as newDbLib:
         newDbLib.write(newDbLibString)
         newDbLib.close()
-    if(not os.path.exists(cwd + ".scrybe.conf")):#only setup config if needed
+    if(not os.path.exists(os.path.join(cwd, ".scrybe.conf"))):#only setup config if needed
         #editor choice
         editor = ""
         while(editor not in ["vim", "emacs", "nano"]):
             editor = raw_input("Vim, emacs or nano?: ").strip().lower()
-        with open(cwd + ".scrybe.conf", "a") as configFile:
+        with open(os.path.join(cwd, ".scrybe.conf"), "a") as configFile:
             configFile.write("editor:" + editor + "\n")
 #re-write userlib for new config location
-    with open(cwd + "userLib.py", "r") as userLib:
-        userLibString = userLib.read().replace(".scrybe.conf", cwd + ".scrybe.conf")
-    with open(cwd + "userLib.py", "w") as userLib:
+    with open(os.path.join(cwd, "userLib.py", "r")) as userLib:
+        userLibString = userLib.read().replace(".scrybe.conf", os.path.join(cwd, ".scrybe.conf"))
+    with open(os.path.join(cwd, "userLib.py"), "w") as userLib:
         userLib.write(userLibString)
 
 #crypto shit
@@ -75,15 +76,16 @@ def main():
                 print("to finish setup without database encryption")
         userPass = hasher(userpass1)
         iv = Random.new().read(16)
-        with open(cwd + "scrybe.db", "rb") as plainFile:
+        with open(dbPath, "rb") as plainFile:
             plainText = iv + plainFile.read()#NOTE - iv used to verify decrypt
         while(len(plainText) % 16 != 0):
             plainText += " "
-        os.rename(cwd + "scrybe.db", cwd + "scrybe.db.bak")
+        dbBakPath = os.path.join(cwd, "scrybe.db.bak")
+        os.rename(dbPath, dbBakPath)
         encrypter = AES.new(userPass, AES.MODE_CBC, iv)
-        with open(cwd + "scrybe.db.enc", "wb") as encFile:
+        with open(os.path.join(cwd, "scrybe.db.enc"), "wb") as encFile:
             encFile.write(iv + encrypter.encrypt(plainText))#iv prepended to ciphertext
-        os.remove(cwd + "scrybe.db.bak")#NOTE - only remove backup after write
+        os.remove(dbBakPath)#NOTE - only remove backup after write
         with open(cwd + ".scrybe.conf", "a") as configFile:
             configFile.write("encrypted:true\n")
 
