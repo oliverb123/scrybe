@@ -25,7 +25,7 @@ class Session:
         conf = {"editor":"vim",
                 "encrypted":"false",
                 "iv":"1234567891234567"}
-        with open(".scrybe.conf", "r") as configFile:
+        with open("/home/osadmin/dev-code/scrybe-test/scrybe/.scrybe.conf", "r") as configFile:
             for line in configFile.readlines():
                 if(line.strip() and line.strip()[0] != "#"):
                     try:
@@ -459,17 +459,17 @@ class Session:
         userPass = self.userPass#use passphrase hash generated on decryption
         with open(dbName, "rb") as plainFile:
             plainText = iv + plainFile.read()
-        os.rename(dbName, os.path.join(dbName, ".bak"))
+        os.rename(dbName, dbName + ".bak")
         while(len(plainText) % 16 != 0):
             plainText += " "
         encText = iv + AES.new(userPass, AES.MODE_CBC, iv).encrypt(plainText)
-        with open(os.path.join(dbName, ".enc"), "wb") as encFile:
+        with open(dbName + ".enc", "wb") as encFile:
             encFile.write(encText)
         os.remove(dbName + ".bak")#NOTE - only remove backup after write
     
     def decrypt(self, dbName):
         userPass = hasher(raw_input("Enter passphrase: "))
-        with open(os.path.join(dbName, ".enc"), "rb") as encFile:
+        with open(dbName + ".enc", "rb") as encFile:
             encText = encFile.read()
         iv = encText[:16]#pull iv from front of ciphertext
         encText = encText[16:]#strip iv from cipherText
