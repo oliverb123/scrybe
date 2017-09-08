@@ -4,7 +4,6 @@ Immediate:
 
 Roadmap:
     -Potentially build a gui web app? Maybe. I've walked this road before
-    -Improved commandline input (working arrow keys ffs)
 
 Ongoing:
     -Keep tweaking search algorithm weights
