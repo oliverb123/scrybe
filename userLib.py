@@ -334,7 +334,7 @@ class Session:
             filterMatch = {"t":self.tagFilter, "d":self.dateFilter}
             filterMatch[choiceList[3].lower()](choiceList, printMode)
 
-    def tagFilter(self, choiceList, printMode="print"):#current default filter type
+    def tagFilter(self, choiceList, printMode="print"):
         if(len(choiceList) < 2 or not choiceList[1]):
             print("You need to supply at least one tag to filter by")
             return
@@ -346,14 +346,16 @@ class Session:
             mode = modeSelector[choiceList[2]]
         else:
             mode = modeSelector["c"]
-        tagList = choiceList[1].split(",")
-        tagList = map(lambda x: x.strip(), tagList)
+        tagList = [tag.strip() for tag in choiceList[1].split(",")]
+        excludeList = [tag[1:] for tag in tagList if tag[0] == "-"]
+        includeList = [tag for tag in tagList if tag[0] != "-"]
         notes = self.conn.getNotes(mode)
         if(printMode == "print"):
             printString = ""
             for note in notes:
-                matchingTags = [tag for tag in tagList if tag in note.tags]
-                if(len(matchingTags) == len(tagList)):
+                matchTags = [tag for tag in includeList if tag in note.tags]
+                excTags = [tag for tag in excludeList if tag in note.tags]
+                if(len(matchTags) == len(includeList) and not excTags):
                     printString += (self.oneLineStringGen(note))
             if(not printString):
                 printString = "Sorry, nothing matching that filter found"
@@ -506,7 +508,7 @@ class Session:
             plainFile.write(plainText[16:])
             plainFile.flush()
 
-    
+
 def hasher(plain):
     i = 0
     while(i < 64000):

@@ -4,7 +4,7 @@ Immediate:
         -Add check for (-) in front of any tag
 
 Roadmap:
-    -Ability to export all tags in a filter
+    -Ability to export all tags matching filter
     -Potentially build a gui web app? Maybe. I've walked this road before
 
 Ongoing:
