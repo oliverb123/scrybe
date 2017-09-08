@@ -11,6 +11,8 @@ def createDatabase(path):
         c.execute(command)
         conn.commit()
         conn.close()
+    else:
+        print("Old database found, continuing setup with it")
 
 def configure(dbPath):
     """
@@ -93,16 +95,15 @@ def encryptDatabase(dbPath):
     with open(os.path.join(cwd, "scrybe.db.enc"), "wb") as encFile:
         encFile.write(iv + encrypter.encrypt(plainText))#iv prepended to ciphertext
     os.remove(dbBakPath)#NOTE - only remove backup after write
-    with open(cwd + ".scrybe.conf", "a") as configFile:
+    with open(os.path.join(cwd + ".scrybe.conf"), "a") as configFile:
         configFile.write("encrypted:true\n")
 
-def hasher(plain):
+def hasher(plain):#util function to hash user passwords
     i = 0
     while(i < 64000):
         plain = hashlib.sha256(plain).digest()
         i += 1
     return(plain)
-
 
 def main():
     cwd = os.getcwd()

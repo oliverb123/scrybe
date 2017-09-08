@@ -1,6 +1,4 @@
 Immediate:
-    -Review database encryption code:
-        -Clean up implementation
     -Add a changelog to the readme, that documents the latest changes
 
 Roadmap:

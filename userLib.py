@@ -8,6 +8,7 @@ import hashlib
 try:
     import readline
 except:
+    print("Readline module not supported")
     pass
 
 class Session:
