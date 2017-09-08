@@ -95,7 +95,7 @@ def encryptDatabase(dbPath):
     with open(os.path.join(cwd, "scrybe.db.enc"), "wb") as encFile:
         encFile.write(iv + encrypter.encrypt(plainText))#iv prepended to ciphertext
     os.remove(dbBakPath)#NOTE - only remove backup after write
-    with open(os.path.join(cwd + ".scrybe.conf"), "a") as configFile:
+    with open(os.path.join(cwd, ".scrybe.conf"), "a") as configFile:
         configFile.write("encrypted:true\n")
 
 def hasher(plain):#util function to hash user passwords
