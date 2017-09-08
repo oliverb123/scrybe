@@ -1,4 +1,5 @@
 Immediate:
+    -Fix major bug with setup.py and encryption config flag
     -Add a changelog to the readme, that documents the latest changes
 
 Roadmap:
