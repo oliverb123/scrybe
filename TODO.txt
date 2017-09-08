@@ -1,7 +1,10 @@
 Immediate:
-    -Add a changelog to the readme, that documents the latest changes
+    -Add exclusionary tags to filter system
+        -Exclude (-) as a valid tag starting character
+        -Add check for (-) in front of any tag
 
 Roadmap:
+    -Ability to export all tags in a filter
     -Potentially build a gui web app? Maybe. I've walked this road before
 
 Ongoing:

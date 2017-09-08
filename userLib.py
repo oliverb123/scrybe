@@ -90,7 +90,7 @@ class Session:
             return
         choiceFuncs[choiceList[0]](choiceList)
 
-    def listNotes(self, choiceList):#list all notes in db
+    def listNotes(self, choiceList, mode="print"):#list all notes in db
         modeSwitchDict = {"c":"current", "a":"archived", "b":"all"}
         if(len(choiceList) < 2):
             choiceList.append("c")
@@ -100,12 +100,15 @@ class Session:
         requestMode = modeSwitchDict[choiceList[1]]
         notesList = self.conn.getNotes(mode=requestMode)
         printString = ""
-        if(not notesList):
-            printString = "No notes found"
+        if(mode == "print"):
+            if(not notesList):
+                printString = "No notes found"
+            else:
+                for note in notesList:
+                    printString += self.oneLineStringGen(note)
+            print(printString.strip())
         else:
-            for note in notesList:
-                printString += self.oneLineStringGen(note)
-        print(printString.strip())
+            return(notesList)
 
     def oneLineStringGen(self, note, maxChars=60):#one line repr of passed note
         noteId = note.id
@@ -126,7 +129,7 @@ class Session:
         printString += appendString
         return(printString)
 
-    def searchNotes(self, choiceList):#weighted search of title, body and tags
+    def searchNotes(self, choiceList, mode="print"):#weighted search of title, body and tags
         if(len(choiceList) < 2):
             print("You need to specify a search string")
             return
@@ -149,13 +152,16 @@ class Session:
             if(matchValue > 0):
                 matchingNotes.append((note, matchValue))
         matchingNotes.sort(key=lambda x: x[1], reverse=True)
-        printString = ""
-        for noteTuple in matchingNotes:
-            printString += self.oneLineStringGen(noteTuple[0])
-        if(printString):
-            print(printString.strip())
+        if(mode == "print"):
+            printString = ""
+            for noteTuple in matchingNotes:
+                printString += self.oneLineStringGen(noteTuple[0])
+            if(printString):
+                print(printString.strip())
+            else:
+                print("Nothing found matching those search terms, sorry")
         else:
-            print("Nothing found matching those search terms, sorry")
+            return(matchingNotes)
 
     def addNote(self, choiceList):#adds a note to the db
         if(len(choiceList) > 2 and choiceList[1]):
@@ -202,7 +208,7 @@ class Session:
         printString += body
         return(printString.strip())
 
-    def archiveHandler(self, choiceList):#TODO - improve functionality
+    def archiveHandler(self, choiceList):
         if(len(choiceList) < 2):
             print("You need to specify a note to archive")
             return
@@ -319,22 +325,22 @@ class Session:
         self.conn.addNote(title, body, tags)
         print("Note imported")
 
-    def filter(self, choiceList):#function to work out filter mode; date or tag
+    def filter(self, choiceList, printMode="print"):#function to work out filter mode; date or tag
         if(len(choiceList) < 4):
-            self.tagFilter( choiceList)
+            self.tagFilter(choiceList, printMode)
         elif(choiceList[3].lower() not in ["t", "d"]):
             print("Sorry, " + choiceList[3] + " isn't a valid filter mode")
         else:
             filterMatch = {"t":self.tagFilter, "d":self.dateFilter}
-            filterMatch[choiceList[3].lower()](choiceList)
+            filterMatch[choiceList[3].lower()](choiceList, printMode)
 
-    def tagFilter(self, choiceList):#current default filter type
+    def tagFilter(self, choiceList, printMode="print"):#current default filter type
         if(len(choiceList) < 2 or not choiceList[1]):
             print("You need to supply at least one tag to filter by")
             return
         modeSelector = {"a":"archived", "b":"all", "c":"current"}
         if(len(choiceList) > 2 and choiceList[2]):#choose note get mode
-            if(choiceList[2] not in modeSelector.keys()):
+            if(choiceList[2] not in modeSelector.keys() and printMode=="print"):
                 print("Sorry, " + choiceList[2] + " isn't a valid option")
                 return
             mode = modeSelector[choiceList[2]]
@@ -343,16 +349,19 @@ class Session:
         tagList = choiceList[1].split(",")
         tagList = map(lambda x: x.strip(), tagList)
         notes = self.conn.getNotes(mode)
-        printString = ""
-        for note in notes:
-            matchingTags = [tag for tag in tagList if tag in note.tags]
-            if(len(matchingTags) == len(tagList)):
-                printString += (self.oneLineStringGen(note))
-        if(not printString):
-            printString = "Sorry, nothing matching that filter found"
-        print(printString.strip())
+        if(printMode == "print"):
+            printString = ""
+            for note in notes:
+                matchingTags = [tag for tag in tagList if tag in note.tags]
+                if(len(matchingTags) == len(tagList)):
+                    printString += (self.oneLineStringGen(note))
+            if(not printString):
+                printString = "Sorry, nothing matching that filter found"
+            print(printString.strip())
+        else:
+            return(notes)
 
-    def getTags(self, choiceList):#NOTE - should this have archive selector?
+    def getTags(self, choiceList, printMode="print"):
         notes = self.conn.getNotes()
         tagPairs = []
         for note in notes:
@@ -362,13 +371,16 @@ class Session:
                     tagPairs[tagList.index(tag)][1] += 1
                 else:
                     tagPairs.append([tag, 1])
-        if(not tagPairs):
-             print("You haven't tagged anything")
-             return
-        for tagPair in tagPairs:
-             print(" | " + tagPair[0] + " : " + str(tagPair[1]) + " | ")
+        if(printMode == "print"):
+            if(not tagPairs):
+                print("You haven't tagged anything")
+                return
+            for tagPair in tagPairs:
+                print(" | " + tagPair[0] + " : " + str(tagPair[1]) + " | ")
+        else:
+            return(tagPairs)
 
-    def dateFilter(self, choiceList):
+    def dateFilter(self, choiceList, printMode="print"):
         #TODO -- See if you can clean this up
         choiceList[1] = choiceList[1].lower()
         lowPass = time.time()
@@ -390,7 +402,8 @@ class Session:
             lowPass = time.mktime(time.strptime(dates[0], "%d/%m/%Y"))
             highPass = time.mktime(time.strptime(dates[1], "%d/%m/%Y"))
         else:
-            print("Sorry, that date format isn't valid")
+            if(printMode == "print"):
+                print("Sorry, that date format isn't valid")
             return
         if(not highPass):
             highPass = time.time()
@@ -400,20 +413,24 @@ class Session:
             if(choiceList[2] in modeSelector.keys()):
                 mode = modeSelector[choiceList[2]]
             else:
-                print("Sorry, " + choiceList[2] + " isn't a valid option")
+                if(printMode == "print"):
+                    print("Sorry, " + choiceList[2] + " isn't a valid option")
                 return
         notes = self.conn.getNotes(mode)
-        if(not notes):
+        if(not notes and printMode == "print"):
             print("You don't have any notes to filter")
         matchingNotes = []
         for note in notes:
             if(note.createTime > lowPass and note.createTime < highPass):
                 matchingNotes.append(note)
         matchingNotes.sort(key = lambda x: x.createTime, reverse=True)
-        printString = ""
-        for note in matchingNotes:
-            printString += self.oneLineStringGen(note)
-        print(printString.strip())
+        if(printMode == "print"):
+            printString = ""
+            for note in matchingNotes:
+                printString += self.oneLineStringGen(note)
+            print(printString.strip())
+        else:
+            return(matchingNotes)
 
     def export(self, choiceList):#dumps the body of a note into a file
         if(len(choiceList) < 2 or not choiceList[1]):
