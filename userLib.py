@@ -25,7 +25,7 @@ class Session:
         conf = {"editor":"vim",
                 "encrypted":"false",
                 "iv":"1234567891234567"}
-        with open("/home/osadmin/dev-code/scrybe-test/scrybe/.scrybe.conf", "r") as configFile:
+        with open(".scrybe.conf", "r") as configFile:
             for line in configFile.readlines():
                 if(line.strip() and line.strip()[0] != "#"):
                     try:
